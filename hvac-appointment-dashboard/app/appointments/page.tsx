@@ -1,0 +1,1 @@
+import Appointments from "../../components/Appointments"; export default function Page(){return <Appointments/>}

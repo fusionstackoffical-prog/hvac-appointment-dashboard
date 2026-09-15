@@ -1,0 +1,1 @@
+import Availability from "../../components/Availability"; export default function Page(){return <Availability/>}

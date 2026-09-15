@@ -1,0 +1,5 @@
+"use client";
+import Link from "next/link"; import {LayoutDashboard,CalendarDays,Users,Clock3,Settings,Wind} from "lucide-react";
+export default function Shell({title,subtitle,children}:{title:string;subtitle:string;children:React.ReactNode}){
+const nav=[["/","Dashboard",LayoutDashboard],["/appointments","Appointments",CalendarDays],["/leads","Leads",Users],["/availability","Availability",Clock3],["/settings","Settings",Settings]] as const;
+return <div className="shell"><aside><div className="brand"><span><Wind size={20}/></span><div><b>Midland Comfort</b><small>HVAC</small></div></div><nav>{nav.map(([href,label,Icon])=><Link href={href} key={href}><Icon size={17}/>{label}</Link>)}</nav><div className="owner"><strong>MC</strong><div><b>Owner</b><small>Midland Comfort</small></div></div></aside><main><header><div><label>HVAC OPERATIONS</label><h1>{title}</h1><p>{subtitle}</p></div><div className="online">● System online <strong>MC</strong></div></header><section>{children}</section></main></div>}
