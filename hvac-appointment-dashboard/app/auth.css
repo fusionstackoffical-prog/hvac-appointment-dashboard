@@ -1,0 +1,1 @@
+.auth-page{min-height:100vh;display:grid;place-items:center;padding:20px}.auth-card{width:min(420px,100%)}.auth-fields{grid-template-columns:1fr}.auth-card .availability-message{margin:0 20px}.owner{flex-wrap:wrap}.owner .logout{height:24px;padding:0 7px;margin-left:auto;background:transparent;border-color:#3d4a56;color:#b9c4cf;font-size:9px}

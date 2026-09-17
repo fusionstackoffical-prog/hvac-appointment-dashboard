@@ -1,0 +1,5 @@
+.appointments-tr{grid-template-columns:1.3fr 1fr 1fr .8fr .9fr 1fr}
+.upcoming-tr{grid-template-columns:1.3fr 1fr 1fr .8fr .9fr}
+.status-select{height:27px;padding:0 7px;font-size:9px;border:0;border-radius:99px;background:#edf1f4;color:#64717d}
+.status-select.confirmed{background:#e9f7ef;color:#28734e}.status-select.pending{background:#fff5dc;color:#876719}.status-select.completed{background:#e8f0f8;color:#38627a}.status-select.cancelled{background:#fbecee;color:#a34854}
+.modal-backdrop{position:fixed;inset:0;background:#17212b66;display:grid;place-items:center;padding:20px;z-index:10}.appointment-modal{width:min(680px,100%);max-height:calc(100vh - 40px);overflow:auto}.appointment-fields{border-bottom:1px solid #edf0f3}.modal-actions{display:flex;justify-content:flex-end;gap:8px;padding:16px 20px}.fields label small{font-weight:400;color:#8a949e}

@@ -5,7 +5,7 @@ import Shell from "./Shell";
 import { supabase } from "../lib/supabase";
 
 type AvailabilityDay = { dayOfWeek: number; name: string; enabled: boolean; start: string; end: string; appointmentDuration: number };
-type AvailabilityRow = { day_of_week: number; start_time: string; end_time: string; enabled: boolean; appointment_duration?: number | null; duration_minutes?: number | null };
+type AvailabilityRow = { day_of_week: number; start_time: string; end_time: string; enabled: boolean; appointment_duration?: number | null };
 
 const defaultDays: AvailabilityDay[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((name, dayOfWeek) => ({
   dayOfWeek, name, enabled: dayOfWeek > 0 && dayOfWeek < 6, start: "08:00", end: "17:00", appointmentDuration: 60,
@@ -21,21 +21,16 @@ export default function Availability() {
     const byDay = new Map(rows.map((row) => [row.day_of_week, row]));
     setDays(defaultDays.map((day) => {
       const row = byDay.get(day.dayOfWeek);
-      return row ? { ...day, enabled: row.enabled, start: row.start_time.slice(0, 5), end: row.end_time.slice(0, 5), appointmentDuration: row.appointment_duration ?? row.duration_minutes ?? day.appointmentDuration } : day;
+      return row ? { ...day, enabled: row.enabled, start: row.start_time.slice(0, 5), end: row.end_time.slice(0, 5), appointmentDuration: row.appointment_duration ?? day.appointmentDuration } : day;
     }));
   }, []);
 
   const loadAvailability = useCallback(async () => {
     setLoading(true);
     setMessage("");
-    const fullResult = await supabase.from("availability").select("day_of_week, start_time, end_time, enabled, appointment_duration, duration_minutes").order("day_of_week");
-    if (!fullResult.error) {
-      applyRows((fullResult.data ?? []) as AvailabilityRow[]);
-    } else {
-      const scheduleResult = await supabase.from("availability").select("day_of_week, start_time, end_time, enabled").order("day_of_week");
-      if (scheduleResult.error) setMessage(`Could not load availability: ${scheduleResult.error.message}`);
-      else applyRows(scheduleResult.data as AvailabilityRow[]);
-    }
+    const result = await supabase.from("availability").select("day_of_week, start_time, end_time, enabled, appointment_duration").order("day_of_week");
+    if (result.error) setMessage(`Could not load availability: ${result.error.message}`);
+    else applyRows((result.data ?? []) as AvailabilityRow[]);
     setLoading(false);
   }, [applyRows]);
 
