@@ -1,1 +1,9 @@
-.auth-page{min-height:100vh;display:grid;place-items:center;padding:20px}.auth-card{width:min(420px,100%)}.auth-fields{grid-template-columns:1fr}.auth-card .availability-message{margin:0 20px}.owner{flex-wrap:wrap}.owner .logout{height:24px;padding:0 7px;margin-left:auto;background:transparent;border-color:#3d4a56;color:#b9c4cf;font-size:9px}
+.auth-page { width: 100%; min-height: 100vh; display: grid; place-items: center; padding: 24px; background: radial-gradient(ellipse at 50% 25%,#1c3f5144,transparent 65%),var(--bg); }
+.auth-card { width: min(440px,100%); border-color: #314756; box-shadow: 0 24px 70px #0005; }
+.auth-card .head { padding: 28px; }
+.auth-card .head h3 { font-size: 20px; letter-spacing: -.04em; }
+.auth-card .head small { line-height: 1.8; margin-top: 9px; }
+.auth-fields { grid-template-columns: 1fr; padding: 28px; }
+.auth-card .availability-message { margin: 0 28px 20px; }
+.auth-card .modal-actions { padding: 20px 28px; }
+.auth-card .primary { width: 100%; }

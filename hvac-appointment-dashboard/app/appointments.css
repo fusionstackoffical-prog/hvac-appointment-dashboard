@@ -1,5 +1,21 @@
-.appointments-tr{grid-template-columns:1.3fr 1fr 1fr .8fr .9fr 1fr}
-.upcoming-tr{grid-template-columns:1.3fr 1fr 1fr .8fr .9fr}
-.status-select{height:27px;padding:0 7px;font-size:9px;border:0;border-radius:99px;background:#edf1f4;color:#64717d}
-.status-select.confirmed{background:#e9f7ef;color:#28734e}.status-select.pending{background:#fff5dc;color:#876719}.status-select.completed{background:#e8f0f8;color:#38627a}.status-select.cancelled{background:#fbecee;color:#a34854}
-.modal-backdrop{position:fixed;inset:0;background:#17212b66;display:grid;place-items:center;padding:20px;z-index:10}.appointment-modal{width:min(680px,100%);max-height:calc(100vh - 40px);overflow:auto}.appointment-fields{border-bottom:1px solid #edf0f3}.modal-actions{display:flex;justify-content:flex-end;gap:8px;padding:16px 20px}.fields label small{font-weight:400;color:#8a949e}
+/* Scheduling and customer table details. */
+.appointments-table { min-width: 940px; }
+.leads-table { min-width: 1210px; }
+.leads-table .problem-cell { min-width: 190px; max-width: 280px; overflow-wrap: anywhere; }
+.status-select { width: auto; min-width: 117px; min-height: 33px; border-radius: 6px; font-size: 11px; padding: 6px 9px; cursor: pointer; }
+.status-select.confirmed { background: #17382d88; border-color: #29523f; color: var(--success); }
+.status-select.pending { background: #372e1c88; border-color: #57472d; color: var(--warning); }
+.status-select.completed { background: #1b314688; border-color: #304c63; color: #a2cbe9; }
+.status-select.cancelled { background: #39252a88; border-color: #59353e; color: var(--error); }
+.status-select option { background: var(--surface); color: var(--text); }
+.appointment-dialog { padding: 0; width: min(700px,calc(100% - 32px)); max-height: calc(100dvh - 40px); border: 1px solid #3b4f5e; border-radius: 16px; color: var(--text); background: var(--surface); box-shadow: 0 24px 100px #0009; }
+.appointment-dialog::backdrop { background: #02070cc9; backdrop-filter: blur(4px); }
+.appointment-modal .head { padding: 24px; }
+.appointment-modal .head h2 { font-size: 21px; margin-top: 8px; }
+.appointment-modal .head .icon-button { align-self: flex-start; }
+.form-section-title { display: flex; align-items: center; gap: 10px; color: #cfdae4; font-size: 12px; font-weight: 500; padding: 24px 24px 0; }
+.form-section-title span { border: 1px solid #354958; padding: 2px 6px; border-radius: 5px; font-size: 10px; color: #9ebdce; }
+.appointment-fields { padding-top: 18px; border-bottom: 1px solid var(--border-soft); }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; padding: 20px 24px; background: #0e1720; }
+.modal-message { margin: 20px 24px 0; }
+@media (max-width: 480px) { .appointment-modal .head { padding: 20px 16px; } .form-section-title { padding-left: 16px; } .modal-actions { padding: 16px; } }

@@ -6,9 +6,9 @@ export type AppointmentStatus = (typeof appointmentStatuses)[number];
 type AppointmentLead = { name: string; service: string; location: string } | null;
 type AppointmentRecord = { id: string; appointment_date: string; appointment_time: string; status: string; created_at: string; leads: AppointmentLead | AppointmentLead[] };
 export type Appointment = { id: string; date: string; time: string; status: AppointmentStatus; customerName: string; service: string; location: string };
-export type Availability = { day_of_week: number; start_time: string; end_time: string; enabled: boolean; appointment_duration: number };
+export type Availability = { day_of_week: number; start_time: string; end_time: string; enabled: boolean; appointment_duration: number; available_slots?: string[] | null };
 export type NewAppointment = { customerName: string; phone: string; email: string; service: string; problem: string; location: string; date: string; time: string };
-export type Lead = { id: string; name: string; service: string; problem: string | null; location: string; appointment: { date: string; time: string; status: string } | null };
+export type Lead = { id: string; name: string; phone: string | null; service: string; problem: string | null; location: string; appointment: { date: string; time: string; status: string } | null };
 
 function asAppointment(record: AppointmentRecord): Appointment {
   const lead = Array.isArray(record.leads) ? record.leads[0] : record.leads;
@@ -25,16 +25,22 @@ export async function loadAppointments() {
 export async function loadAvailability() {
   const result = await supabase.from("availability").select("day_of_week, start_time, end_time, enabled, appointment_duration").order("day_of_week");
   if (result.error) throw result.error;
-  return result.data as Availability[];
+  const availability = result.data as Availability[];
+  // Installations without the additive slot migration retain their existing
+  // continuous-window behaviour until the column is available.
+  const slots = await supabase.from("availability").select("day_of_week, available_slots");
+  if (slots.error) return availability;
+  const slotsByDay = new Map((slots.data ?? []).map((row) => [row.day_of_week, row.available_slots as string[] | null]));
+  return availability.map((day) => ({ ...day, available_slots: slotsByDay.get(day.day_of_week) }));
 }
 
 export async function loadLeads() {
-  const result = await supabase.from("leads").select("id, name, service, problem, location, appointments(appointment_date, appointment_time, status)").order("created_at", { ascending: false });
+  const result = await supabase.from("leads").select("id, name, phone, service, problem, location, appointments(appointment_date, appointment_time, status)").order("created_at", { ascending: false });
   if (result.error) throw result.error;
   return (result.data ?? []).map((lead) => {
     const appointments = lead.appointments as unknown as Array<{ appointment_date: string; appointment_time: string; status: string }> | null;
     const appointment = appointments?.[0] ?? null;
-    return { id: lead.id, name: lead.name, service: lead.service, problem: lead.problem, location: lead.location, appointment: appointment ? { date: appointment.appointment_date, time: appointment.appointment_time, status: appointment.status } : null } as Lead;
+    return { id: lead.id, name: lead.name, phone: lead.phone ?? null, service: lead.service, problem: lead.problem, location: lead.location, appointment: appointment ? { date: appointment.appointment_date, time: appointment.appointment_time, status: appointment.status } : null } as Lead;
   });
 }
 
@@ -44,6 +50,7 @@ export function validateAvailability(input: Pick<NewAppointment, "date" | "time"
   const schedule = availability.find((day) => day.day_of_week === weekday);
   if (!schedule || !schedule.enabled) return "Appointments are not available on the selected day.";
   const start = schedule.start_time.slice(0, 5); const end = schedule.end_time.slice(0, 5);
+  if (Array.isArray(schedule.available_slots) && !schedule.available_slots.some((slot) => slot.slice(0, 5) === input.time)) return "That appointment time is not available.";
   const [hours, minutes] = input.time.split(":").map(Number); const endsAt = hours * 60 + minutes + schedule.appointment_duration;
   const [closeHours, closeMinutes] = end.split(":").map(Number);
   if (input.time < start) return `Appointments start at ${start}.`;
