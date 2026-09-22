@@ -3,17 +3,21 @@ import { supabase } from "./supabase";
 export const appointmentStatuses = ["pending", "confirmed", "completed", "cancelled"] as const;
 export type AppointmentStatus = (typeof appointmentStatuses)[number];
 
-type AppointmentLead = { name: string; service: string; location: string } | null;
-type AppointmentRecord = { id: string; appointment_date: string; appointment_time: string; status: string; created_at: string; leads: AppointmentLead | AppointmentLead[] };
+type AppointmentLead = { name: string | null; service: string | null; location: string | null } | null;
+type AppointmentRecord = { id: string; appointment_date: string | null; appointment_time: string | null; status: string | null; created_at: string; leads: AppointmentLead | AppointmentLead[] };
 export type Appointment = { id: string; date: string; time: string; status: AppointmentStatus; customerName: string; service: string; location: string };
 export type Availability = { day_of_week: number; start_time: string; end_time: string; enabled: boolean; appointment_duration: number; available_slots?: string[] | null };
 export type NewAppointment = { customerName: string; phone: string; email: string; service: string; problem: string; location: string; date: string; time: string };
 export type Lead = { id: string; name: string; phone: string | null; service: string; problem: string | null; location: string; appointment: { date: string; time: string; status: string } | null };
 
+function textOrDash(value: unknown) {
+  return typeof value === "string" && value.trim() ? value.trim() : "—";
+}
+
 function asAppointment(record: AppointmentRecord): Appointment {
   const lead = Array.isArray(record.leads) ? record.leads[0] : record.leads;
   const status = appointmentStatuses.includes(record.status as AppointmentStatus) ? record.status as AppointmentStatus : "pending";
-  return { id: record.id, date: record.appointment_date, time: record.appointment_time, status, customerName: lead?.name ?? "Unknown customer", service: lead?.service ?? "—", location: lead?.location ?? "—" };
+  return { id: record.id, date: typeof record.appointment_date === "string" ? record.appointment_date : "", time: typeof record.appointment_time === "string" ? record.appointment_time : "", status, customerName: textOrDash(lead?.name), service: textOrDash(lead?.service), location: textOrDash(lead?.location) };
 }
 
 export async function loadAppointments() {
@@ -40,7 +44,7 @@ export async function loadLeads() {
   return (result.data ?? []).map((lead) => {
     const appointments = lead.appointments as unknown as Array<{ appointment_date: string; appointment_time: string; status: string }> | null;
     const appointment = appointments?.[0] ?? null;
-    return { id: lead.id, name: lead.name, phone: lead.phone ?? null, service: lead.service, problem: lead.problem, location: lead.location, appointment: appointment ? { date: appointment.appointment_date, time: appointment.appointment_time, status: appointment.status } : null } as Lead;
+    return { id: lead.id, name: textOrDash(lead.name), phone: typeof lead.phone === "string" && lead.phone.trim() ? lead.phone.trim() : null, service: textOrDash(lead.service), problem: textOrDash(lead.problem), location: textOrDash(lead.location), appointment: appointment ? { date: textOrDash(appointment.appointment_date), time: textOrDash(appointment.appointment_time), status: textOrDash(appointment.status) } : null } as Lead;
   });
 }
 
@@ -69,5 +73,15 @@ export async function updateAppointmentStatus(id: string, status: AppointmentSta
   if (result.error) throw result.error;
 }
 
-export function displayDate(date: string) { return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(`${date}T12:00:00`)); }
-export function displayTime(time: string) { const [hours, minutes] = time.slice(0, 5).split(":").map(Number); return new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" }).format(new Date(2000, 0, 1, hours, minutes)); }
+export function displayDate(date: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return "—";
+  const parsed = new Date(`${date}T12:00:00`);
+  return Number.isNaN(parsed.getTime()) ? "—" : new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(parsed);
+}
+export function displayTime(time: string) {
+  const match = /^(\d{2}):(\d{2})/.exec(time);
+  if (!match) return "—";
+  const hours = Number(match[1]); const minutes = Number(match[2]);
+  if (hours > 23 || minutes > 59) return "—";
+  return new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" }).format(new Date(2000, 0, 1, hours, minutes));
+}

@@ -50,7 +50,7 @@ export default function Availability() {
   }, []);
   useEffect(() => { void load(); }, [load]);
 
-  const selectedSlots = useMemo(() => days.reduce((total, day) => total + day.slots.length, 0), [days]);
+  const selectedSlots = useMemo(() => days.reduce((total, day) => total + (day.enabled ? day.slots.length : 0), 0), [days]);
   function updateDay(dayOfWeek: number, update: Partial<AvailabilityDay>) { setDays((current) => current.map((day) => day.dayOfWeek === dayOfWeek ? { ...day, ...update } : day)); setMessage(""); }
   function toggleSlot(dayOfWeek: number, slot: string) {
     setDays((current) => current.map((day) => day.dayOfWeek !== dayOfWeek ? day : { ...day, slots: day.slots.includes(slot) ? day.slots.filter((currentSlot) => currentSlot !== slot) : [...day.slots, slot].sort() }));

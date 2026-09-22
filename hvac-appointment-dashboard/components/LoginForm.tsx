@@ -12,12 +12,15 @@ export default function LoginForm() {
   const [message, setMessage] = useState(searchParams.get("error") === "not_authorized" ? "This account is not authorized to access the dashboard." : "");
   const [loading, setLoading] = useState(false);
 
+  const requestedPath = searchParams.get("next");
+  const destination = requestedPath?.startsWith("/") && !requestedPath.startsWith("//") ? requestedPath : "/";
+
   async function signIn(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true); setMessage("");
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) { setMessage(error.message); setLoading(false); return; }
-    router.replace(searchParams.get("next") || "/");
+    router.replace(destination);
     router.refresh();
   }
 

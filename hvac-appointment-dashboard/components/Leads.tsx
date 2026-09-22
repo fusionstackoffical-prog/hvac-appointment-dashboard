@@ -17,8 +17,8 @@ export default function Leads() {
       <div className="directory-toolbar"><label className="search-control"><Search size={16} aria-hidden="true" /><input aria-label="Search leads (not available)" placeholder="Search leads" disabled /></label><button type="button" disabled>All services</button><button type="button" disabled><SlidersHorizontal size={15} />All statuses</button><span className="control-note">Search & filters are not available yet</span></div>
       <TableContainer label="Customer leads"><table className="data-table leads-table"><thead><tr>{["Customer", "Phone", "Service", "Problem", "Location", "Appointment", "Status"].map((label) => <th key={label} scope="col">{label}</th>)}</tr></thead><tbody>{leads.map((lead) => <tr key={lead.id}>
         <td><CustomerIdentity name={lead.name} /></td>
-        <td>{lead.phone?.trim() ? <a className="phone-link" href={`tel:${lead.phone}`}><Phone size={13} aria-hidden="true" />{lead.phone}</a> : "—"}</td>
-        <td>{lead.service}</td><td className="problem-cell">{lead.problem ?? "—"}</td><td>{lead.location}</td>
+        <td>{lead.phone ? <a className="phone-link" href={`tel:${lead.phone.replace(/[^\d+*#,;]/g, "")}`}><Phone size={13} aria-hidden="true" />{lead.phone}</a> : "—"}</td>
+        <td>{lead.service}</td><td className="problem-cell">{lead.problem}</td><td>{lead.location}</td>
         <td>{lead.appointment ? <div className="date-stack"><span>{displayDate(lead.appointment.date)}</span><small>{displayTime(lead.appointment.time)}</small></div> : <span className="muted">—</span>}</td>
         <td><StatusBadge status={lead.appointment?.status ?? "new"} /></td>
       </tr>)}</tbody></table></TableContainer>
